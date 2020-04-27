@@ -1,0 +1,151 @@
+﻿@using ChessTutorial.Models
+@model IEnumerable<ChessTutorial.Models.Piece>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <style type="text/css">
+        .choosing {
+            width: 270px;
+            height: 190px;
+            margin: 20px;
+            border: 15px solid
+        }
+
+        .chessboard {
+            width: 690px;
+            height: 690px;
+            margin: 20px;
+            border: 25px solid #333;
+        }
+
+        .black {
+            float: left;
+            width: 80px;
+            height: 80px;
+            background-color: rosybrown;
+            font-size: 55px;
+            text-align: center;
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .white {
+            float: left;
+            width: 80px;
+            height: 80px;
+            background-color: wheat;
+            font-size: 55px;
+            text-align: center;
+            display: table-cell;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<table>
+    <tr>
+        <td>
+            <div class="chessboard">
+                @for (int y = 0; y < 4; y++)
+                {
+                    for (int x = 0; x < 4; x++)
+                    {
+                        <div X ="@(2*x+1)" Y ="@(8-2*y)" class="white"></div>
+                        <div X ="@(2*x+2)" Y ="@(8-2*y)" class="black"></div>
+                    }
+                    for (int x = 0; x < 4; x++)
+                    {
+                        <div X ="@(2*x+1)" Y ="@(8-2*y-1)" class="black"></div>
+                        <div X ="@(2*x+2)" Y ="@(8-2*y-1)" class="white"></div>
+                    }
+                }
+            </div>
+        </td>
+        <td>
+            Choose piece:
+            <div class="choosing">
+                @{
+                    var color = "white";
+                    foreach (var piece in Model)
+                    {
+                        <div class="@color" piece-type="@piece.UnicodeSymbol">@piece.UnicodeSymbol</div>
+                        color = (color == "white" ? "black" : "white");
+                    }
+                }
+
+                @*<div class="white">&#9818;</div>
+                    <div class="black">&#9819;</div>
+                    <div class="white">&#9820;</div>
+                    <div class="black">&#9821;</div>
+                    <div class="white">&#9822;</div>
+                    <div class="black clickable">&#9823;</div>*@
+            </div>
+
+        </td>
+    </tr>
+</table>
+
+@section scripts
+{
+    <script>
+        
+        var choosenPiece = "";
+        var PieceX = 0;
+        var PieceY = 0;
+
+        function ActivatePutingPieceOnBoard() {
+            $(".chessboard *")
+                .on("click",
+                    function() {
+                        $(this).text(choosenPiece);
+                        PieceX = 
+                        $(".chessboard *").off("click");
+                    });
+        }
+        function ActivateHoverBoard() {
+            $(".chessboard *")
+                .hover(function () {
+                    $(this).css("background-color", "lightskyblue");
+                },
+                    function () {
+                        $(this).css("background-color", "");
+                    });
+        }
+        function ActivatePieceSelection() {
+
+        }
+
+        $(document).ready(function() {
+
+
+            $(".chessboard *")
+                .on("click",
+                    function() {
+                        $(this).text();
+                        //confirm("Delete?");
+                    });
+
+            $(".choosing *")
+                .hover(function() {
+                        $(this).css("background-color", "lightskyblue");
+                    },
+                    function() {
+                        $(this).css("background-color", "");
+                    });
+
+            $(".choosing *")
+                .on("click",
+                    function() {
+                        $(".choosing *").off("click");
+                        $(this).text("");
+                        choosenPiece = $(this).attr("piece-type");
+                        ActivatePutingPieceOnBoard();
+                        ActivateHoverBoard();
+                    }
+                );
+        })
+    </script>
+}
