@@ -91,8 +91,8 @@
 @section scripts
 {
     <script>
-        
-        var choosenPiece = "";
+
+        var choosenPieceType = "";
         var PieceX = 0;
         var PieceY = 0;
 
@@ -100,22 +100,48 @@
             $(".chessboard *")
                 .on("click",
                     function() {
-                        $(this).text(choosenPiece);
-                        PieceX = 
+                        $(this).text(choosenPieceType);
+                        PieceX = $(this).attr("X");
+                        PieceY = $(this).attr("Y");
+                        $(this).toggleClass("selectedLocation");
                         $(".chessboard *").off("click");
+                        ActivatePieceSelection();
                     });
         }
+
         function ActivateHoverBoard() {
             $(".chessboard *")
-                .hover(function () {
-                    $(this).css("background-color", "lightskyblue");
-                },
-                    function () {
+                .hover(function() {
+                        $(this).css("background-color", "lightskyblue");
+                    },
+                    function() {
                         $(this).css("background-color", "");
                     });
         }
-        function ActivatePieceSelection() {
 
+        function ActivatePieceSelection() {
+            $(".selectedLocation").on("click",
+                function() {
+
+                    var piece = {}
+                    piece.name = "sss";
+                    piece.location= {
+                        x: PieceX,
+                        y: PieceY
+                    }
+
+                    $.ajax({
+                        url: "/api/pieces/checkAvailableMoves",
+                        method: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(piece),
+                        dataType: "json",
+                        success: function() {
+                            alert("It worked!");
+                        }
+                    });
+
+                });
         }
 
         $(document).ready(function() {
@@ -141,7 +167,7 @@
                     function() {
                         $(".choosing *").off("click");
                         $(this).text("");
-                        choosenPiece = $(this).attr("piece-type");
+                        choosenPieceType = $(this).attr("piece-type");
                         ActivatePutingPieceOnBoard();
                         ActivateHoverBoard();
                     }

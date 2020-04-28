@@ -4,15 +4,24 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using ChessTutorial.Dtos;
 
-namespace ChessTutorial.Controllers
+namespace ChessTutorial.Controllers.Api
 {
-    public class ValuesController : ApiController
+    public class PiecesController : ApiController
     {
-        // GET api/values
-        public IEnumerable<string> Get()
+        [HttpPost]
+        // POST api/pieces/checkAvailableMoves
+        public IHttpActionResult CheckAvailableMoves(PieceDto pieceDto)
         {
-            return new string[] { "value1", "value2" };
+            return Ok(new List<LocationDto>() 
+            {
+                new LocationDto() 
+                {
+                    X = 3,
+                    Y = 5
+                }
+            });
         }
 
         // GET api/values/5
