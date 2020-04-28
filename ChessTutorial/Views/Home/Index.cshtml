@@ -30,6 +30,7 @@
             text-align: center;
             display: table-cell;
             vertical-align: middle;
+            border: 1px solid
         }
 
         .white {
@@ -65,23 +66,19 @@
             </div>
         </td>
         <td>
-            Choose piece:
+            <text>Choose piece</text>
             <div class="choosing">
                 @{
                     var color = "white";
                     foreach (var piece in Model)
                     {
-                        <div class="@color" piece-type="@piece.UnicodeSymbol">@piece.UnicodeSymbol</div>
+                        <div class="@color" piece-type="@piece.GetType()" unicode-symbol = "@piece.UnicodeSymbol">
+                            @piece.UnicodeSymbol
+                        </div>
                         color = (color == "white" ? "black" : "white");
                     }
                 }
 
-                @*<div class="white">&#9818;</div>
-                    <div class="black">&#9819;</div>
-                    <div class="white">&#9820;</div>
-                    <div class="black">&#9821;</div>
-                    <div class="white">&#9822;</div>
-                    <div class="black clickable">&#9823;</div>*@
             </div>
 
         </td>
@@ -91,43 +88,115 @@
 @section scripts
 {
     <script>
+        var PieceUnicodeSymbol = "";
+        var PieceType = "";
+        var PieceOnBoard;
 
-        var choosenPieceType = "";
-        var PieceX = 0;
-        var PieceY = 0;
+        $(document).ready(function () {
+
+            $(".choosing *").on("hover",
+                function () {
+                    $(this).css("background-color", "lightskyblue");
+                },
+                    function () {
+                        $(this).css("background-color", "");
+                    });
+
+            $(".choosing *")
+                .on("click",
+                    function () {
+                        $(".choosing *").off("click");
+                        $(".choosing *").off("hover");
+                        $(this).text("");
+                        PieceType = $(this).attr("piece-type");
+                        PieceUnicodeSymbol = $(this).attr("unicode-symbol");
+                        ActivatePutingPieceOnBoard();
+                        ActivateHoverBoard();
+                        $("text").text("Choose position for your piece.");
+                    }
+                );
+        });
 
         function ActivatePutingPieceOnBoard() {
             $(".chessboard *")
                 .on("click",
                     function() {
-                        $(this).text(choosenPieceType);
-                        PieceX = $(this).attr("X");
-                        PieceY = $(this).attr("Y");
-                        $(this).toggleClass("selectedLocation");
+                        PieceOnBoard = $(this);
+                        PieceOnBoard.text(PieceUnicodeSymbol);
                         $(".chessboard *").off("click");
                         ActivatePieceSelection();
+                        $("text").text("Click your piece to move it.");
                     });
         }
 
         function ActivateHoverBoard() {
+            var presentColor;
             $(".chessboard *")
                 .hover(function() {
+                        presentColor = $(this).css("background-color");
                         $(this).css("background-color", "lightskyblue");
                     },
                     function() {
-                        $(this).css("background-color", "");
+                        $(this).css("background-color", presentColor);
+                    }
+                );
+        }
+
+        function ColorAvailableLocations(x, y) {
+            $(`div[X = ${x} ][Y = ${y}]`).css("background-color", "lightblue");
+        }
+
+        function ActivateMoveChoosing() {
+            $(".chessboard *").on("click",
+                function() {
+                    var clickedField = $(this);
+
+                    var piece = {}
+                    piece.name = PieceType;
+                    piece.location = {
+                        x: PieceOnBoard.attr("X"),
+                        y: PieceOnBoard.attr("Y")
+                    }
+                    piece.nextLocation = {
+                        x: $(this).attr("X"),
+                        y: $(this).attr("Y")
+                    }
+                    $.ajax({
+                        url: "/api/pieces/validateMove",
+                        method: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(piece),
+                        dataType: "json",
+                        success: function (data) {
+                            if (data) {
+                                $(".chessboard *").css("background-color", "");
+                                $(".chessboard *").off("click");
+                                PieceOnBoard.text("");
+                                PieceOnBoard = clickedField;
+                                PieceOnBoard.text(PieceUnicodeSymbol);
+                                ActivatePieceSelection();
+                                $("text").text("Nice move. Click your piece to move it again.");
+                            } else {
+                                $(".chessboard *").css("background-color", "");
+                                $(".chessboard *").off("click");
+                                $("text").text("Wrong move. Try again.");
+                                ActivatePieceSelection();
+                            }
+                        }
                     });
+
+                });
         }
 
         function ActivatePieceSelection() {
-            $(".selectedLocation").on("click",
+            PieceOnBoard.on("click",
                 function() {
 
                     var piece = {}
-                    piece.name = "sss";
-                    piece.location= {
-                        x: PieceX,
-                        y: PieceY
+                    piece.name = PieceType;
+                    piece.location = {
+                        x: PieceOnBoard.attr("X"),
+                        y: PieceOnBoard.attr("Y")
                     }
 
                     $.ajax({
@@ -136,42 +205,17 @@
                         contentType: "application/json; charset=utf-8",
                         data: JSON.stringify(piece),
                         dataType: "json",
-                        success: function() {
-                            alert("It worked!");
+                        success: function(data) {
+                            $.each(data,
+                                function(i, location) {
+                                    ColorAvailableLocations(location.X, location.Y);
+                                });
+                            ActivateMoveChoosing();
                         }
                     });
-
                 });
         }
 
-        $(document).ready(function() {
-
-
-            $(".chessboard *")
-                .on("click",
-                    function() {
-                        $(this).text();
-                        //confirm("Delete?");
-                    });
-
-            $(".choosing *")
-                .hover(function() {
-                        $(this).css("background-color", "lightskyblue");
-                    },
-                    function() {
-                        $(this).css("background-color", "");
-                    });
-
-            $(".choosing *")
-                .on("click",
-                    function() {
-                        $(".choosing *").off("click");
-                        $(this).text("");
-                        choosenPieceType = $(this).attr("piece-type");
-                        ActivatePutingPieceOnBoard();
-                        ActivateHoverBoard();
-                    }
-                );
-        })
+        
     </script>
 }

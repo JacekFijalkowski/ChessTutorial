@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using ChessTutorial.Dtos;
+using ChessTutorial.Models;
 
 namespace ChessTutorial.Controllers.Api
 {
@@ -14,35 +15,29 @@ namespace ChessTutorial.Controllers.Api
         // POST api/pieces/checkAvailableMoves
         public IHttpActionResult CheckAvailableMoves(PieceDto pieceDto)
         {
-            return Ok(new List<LocationDto>() 
-            {
-                new LocationDto() 
-                {
-                    X = 3,
-                    Y = 5
-                }
-            });
+            var choosenPiece = Piece.RecognizePiece(pieceDto.Name);
+
+            choosenPiece.Location = new Location(pieceDto.Location.X,pieceDto.Location.Y);
+
+            var availableMoves = choosenPiece.CheckAvailableMoves();
+
+            var availableMovesDto = availableMoves.Select(move => new LocationDto() {X = move.X, Y = move.Y}).ToList();
+
+
+            return Ok(availableMovesDto);
         }
 
-        // GET api/values/5
-        public string Get(int id)
+        // POST api/pieces/validateMove
+        public IHttpActionResult ValidateMove(PieceDto pieceDto)
         {
-            return "value";
+            var choosenPiece = Piece.RecognizePiece(pieceDto.Name);
+
+            choosenPiece.Location = new Location(pieceDto.Location.X,pieceDto.Location.Y);
+
+            Location nextLocation = new Location(pieceDto.NextLocation.X,pieceDto.NextLocation.Y);
+
+            return Ok(choosenPiece.ValidateMove(nextLocation));
         }
 
-        // POST api/values
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        public void Delete(int id)
-        {
-        }
     }
 }

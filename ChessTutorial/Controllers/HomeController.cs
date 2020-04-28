@@ -16,7 +16,8 @@ namespace ChessTutorial.Controllers
             IEnumerable<Piece> pieces = new List<Piece>()
             {
                 new King(),
-                new Rook()
+                new Rook(),
+                new Queen()
             };
             return View("Index",pieces);
         }
