@@ -23,18 +23,22 @@ namespace ChessTutorial.Models
             return availableMoves.Any(m=>m.X==newLocation.X&m.Y==newLocation.Y);
         }
 
-        public static Piece RecognizePiece(string name)
+        public static IEnumerable<Piece> GetAllPieces()
         {
-            IEnumerable<Piece> allPieces = new List<Piece>()
+            return new List<Piece>()
             {
                 new King(),
                 new Rook(),
-                new Queen()
+                new Queen(),
+                new Bishop(),
+                new Knight(),
+                new Pawn()
             };
-
-            Piece choosenPiece = allPieces.First(p => p.GetType().ToString() == name);
-
-            return choosenPiece;
+        }
+        public static Piece RecognizePiece(string typeName)
+        {
+            var allPieces = GetAllPieces();
+            return allPieces.First(p => p.GetType().ToString() == typeName);
         }
 
     }
@@ -48,7 +52,21 @@ namespace ChessTutorial.Models
         }
         public override IEnumerable<Location> CheckAvailableMoves()
         {
-            return new List<Location>();
+            var availableMoves = new List<Location>();
+
+            for (int x = -7; x <= 7; x++)
+            {
+                availableMoves.Add(new Location((byte)(Location.X+x),(byte)(Location.Y)));
+            }
+            for (int y = -7; y <= 7; y++)
+            {
+                availableMoves.Add(new Location((byte)(Location.X),(byte)(Location.Y+y)));
+            }
+
+            availableMoves.RemoveAll(m => m.IsOnChessboard == false);
+            availableMoves.RemoveAll(m => m.X == Location.X & m.Y == Location.Y);
+
+            return availableMoves;
         }
 
     }
@@ -88,9 +106,74 @@ namespace ChessTutorial.Models
         }
         public override IEnumerable<Location> CheckAvailableMoves()
         {
+            var bishop = new Bishop(){Location = Location};
+            var rook = new Rook(){Location = Location};
+
+            var bishopMoves = bishop.CheckAvailableMoves();
+            var rookMoves = rook.CheckAvailableMoves();
+
+            var queenMoves = new List<Location>();
+            queenMoves.AddRange(bishopMoves);
+            queenMoves.AddRange(rookMoves);
+
+            return queenMoves;
+        }
+
+    }
+    public class Bishop : Piece
+    {
+        public Bishop()
+        {
+            HtmlCode = "&#9821;";
+            UnicodeSymbol = "\u265D";
+        }
+        public override IEnumerable<Location> CheckAvailableMoves()
+        {
+            var availableMoves = new List<Location>();
+
+            for (int i = 1; i <= 7; i++)
+            {
+                availableMoves.Add(new Location((byte)(Location.X+i),(byte)(Location.Y+i)));
+                availableMoves.Add(new Location((byte)(Location.X+i),(byte)(Location.Y-i)));
+                availableMoves.Add(new Location((byte)(Location.X-i),(byte)(Location.Y+i)));
+                availableMoves.Add(new Location((byte)(Location.X-i),(byte)(Location.Y-i)));
+            }
+
+            availableMoves.RemoveAll(m => m.IsOnChessboard == false);
+            availableMoves.RemoveAll(m => m.X == Location.X & m.Y == Location.Y);
+
+            return availableMoves;
+        }
+
+    }
+    public class Knight : Piece
+    {
+        public Knight()
+        {
+            HtmlCode = "&#9822;";
+            UnicodeSymbol = "\u265E";
+        }
+        public override IEnumerable<Location> CheckAvailableMoves()
+        {
             return new List<Location>();
         }
 
     }
+    public class Pawn : Piece
+    {
+        public Pawn()
+        {
+            HtmlCode = "&#9823;";
+            UnicodeSymbol = "\u265F";
+        }
+        public override IEnumerable<Location> CheckAvailableMoves()
+        {
+            var availableMoves = new List<Location>();
 
+            availableMoves.Add(new Location((byte)(Location.X),(byte)(Location.Y+1)));
+
+            return availableMoves;
+        }
+
+    }
 }

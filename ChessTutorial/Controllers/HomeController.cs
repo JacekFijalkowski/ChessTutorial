@@ -13,12 +13,7 @@ namespace ChessTutorial.Controllers
         public ActionResult Index()
         {
             ViewBag.Title = "Home Page";
-            IEnumerable<Piece> pieces = new List<Piece>()
-            {
-                new King(),
-                new Rook(),
-                new Queen()
-            };
+            var pieces = Piece.GetAllPieces();
             return View("Index",pieces);
         }
     }
