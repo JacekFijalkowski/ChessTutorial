@@ -43,6 +43,14 @@
             display: table-cell;
             vertical-align: middle;
         }
+        .noselect {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Opera and Firefox */
+        }
     </style>
 </head>
 
@@ -54,13 +62,13 @@
                 {
                     for (int x = 0; x < 4; x++)
                     {
-                        <div X ="@(2*x+1)" Y ="@(8-2*y)" class="white"></div>
-                        <div X ="@(2*x+2)" Y ="@(8-2*y)" class="black"></div>
+                        <div X ="@(2*x+1)" Y ="@(8-2*y)" class="white noselect"></div>
+                        <div X ="@(2*x+2)" Y ="@(8-2*y)" class="black noselect"></div>
                     }
                     for (int x = 0; x < 4; x++)
                     {
-                        <div X ="@(2*x+1)" Y ="@(8-2*y-1)" class="black"></div>
-                        <div X ="@(2*x+2)" Y ="@(8-2*y-1)" class="white"></div>
+                        <div X ="@(2*x+1)" Y ="@(8-2*y-1)" class="black noselect"></div>
+                        <div X ="@(2*x+2)" Y ="@(8-2*y-1)" class="white noselect"></div>
                     }
                 }
             </div>
@@ -72,7 +80,7 @@
                     var color = "white";
                     foreach (var piece in Model)
                     {
-                        <div class="@color" piece-type="@piece.GetType()" unicode-symbol = "@piece.UnicodeSymbol">
+                        <div class="@color noselect" piece-type="@piece.GetType()" unicode-symbol = "@piece.UnicodeSymbol">
                             @piece.UnicodeSymbol
                         </div>
                         color = (color == "white" ? "black" : "white");
