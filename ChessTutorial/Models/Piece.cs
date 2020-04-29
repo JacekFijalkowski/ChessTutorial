@@ -19,7 +19,6 @@ namespace ChessTutorial.Models
         {
             var availableMoves = CheckAvailableMoves();
 
-            // sprawdzić czy nie da się uproscic z equal
             return availableMoves.Any(m=>m.X==newLocation.X&m.Y==newLocation.Y);
         }
 

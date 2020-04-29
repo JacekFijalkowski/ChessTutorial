@@ -80,7 +80,7 @@
                     var color = "white";
                     foreach (var piece in Model)
                     {
-                        <div class="@color noselect" piece-type="@piece.GetType()" unicode-symbol = "@piece.UnicodeSymbol">
+                        <div class="@color noselect" piece-type="@piece.GetType()" unicode-symbol="@piece.UnicodeSymbol">
                             @piece.UnicodeSymbol
                         </div>
                         color = (color == "white" ? "black" : "white");
@@ -88,6 +88,7 @@
                 }
 
             </div>
+            <button href>@Html.ActionLink("Restart", "Index", "Home")</button>
 
         </td>
     </tr>
