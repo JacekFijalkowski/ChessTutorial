@@ -155,7 +155,19 @@ namespace ChessTutorial.Models
         }
         public override IEnumerable<Location> CheckAvailableMoves()
         {
-            return new List<Location>();
+            var availableMoves = new List<Location>();
+
+            availableMoves.Add(new Location((byte)(Location.X-1),(byte)(Location.Y+2)));
+            availableMoves.Add(new Location((byte)(Location.X+1),(byte)(Location.Y+2)));
+            availableMoves.Add(new Location((byte)(Location.X-2),(byte)(Location.Y+1)));
+            availableMoves.Add(new Location((byte)(Location.X+2),(byte)(Location.Y+1)));
+            availableMoves.Add(new Location((byte)(Location.X-2),(byte)(Location.Y-1)));
+            availableMoves.Add(new Location((byte)(Location.X-1),(byte)(Location.Y-2)));
+            availableMoves.Add(new Location((byte)(Location.X+1),(byte)(Location.Y-2)));
+            availableMoves.Add(new Location((byte)(Location.X+2),(byte)(Location.Y-1)));
+
+
+            return availableMoves;
         }
 
     }
